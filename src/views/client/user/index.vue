@@ -140,6 +140,18 @@
         <el-form-item label="客户姓名" prop="name">
           <el-input v-model="form.name" placeholder="请输入客户姓名"/>
         </el-form-item>
+
+        <el-form-item label="用户性别">
+          <el-select v-model="form.sex" placeholder="请选择">
+            <el-option
+              v-for="dict in sexOptions"
+              :key="dict.dictValue"
+              :label="dict.dictLabel"
+              :value="dict.dictValue"
+            ></el-option>
+          </el-select>
+        </el-form-item>
+
         <el-form-item label="电话" prop="tel">
           <el-input v-model="form.tel" placeholder="请输入电话"/>
         </el-form-item>
@@ -189,7 +201,7 @@ export default {
       // 客户信息表格数据
       clientList: [],
       // 性别数据字典
-      statusOptions: [],
+      sexOptions: [],
       // 弹出层标题
       title: '',
       // 是否显示弹出层
@@ -213,7 +225,7 @@ export default {
   created() {
     this.getList()
     this.getDicts("sys_user_sex").then(response => {
-      this.statusOptions = response.data;
+      this.sexOptions = response.data;
     });
   },
   methods: {
@@ -249,7 +261,7 @@ export default {
     },
     // 字典状态字典翻译
     statusFormat(row, column) {
-      return this.selectDictLabel(this.statusOptions, row.sex);
+      return this.selectDictLabel(this.sexOptions, row.sex);
     },
     /** 搜索按钮操作 */
     handleQuery() {

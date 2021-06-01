@@ -1,31 +1,16 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="出生日期" prop="birthDate">
-        <el-date-picker clearable size="small"
-          v-model="queryParams.birthDate"
-          type="date"
-          value-format="yyyy-MM-dd"
-          placeholder="选择出生日期">
-        </el-date-picker>
-      </el-form-item>
+
       <el-form-item label="拿猫日期" prop="haveDate">
         <el-date-picker clearable size="small"
-          v-model="queryParams.haveDate"
-          type="date"
-          value-format="yyyy-MM-dd"
-          placeholder="选择拿猫日期">
+                        v-model="queryParams.haveDate"
+                        type="date"
+                        value-format="yyyy-MM-dd"
+                        placeholder="选择拿猫日期">
         </el-date-picker>
       </el-form-item>
-      <el-form-item label="拿猫价格" prop="primeCost">
-        <el-input
-          v-model="queryParams.primeCost"
-          placeholder="请输入拿猫价格"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
+
       <el-form-item label="状态" prop="state">
         <el-input
           v-model="queryParams.state"
@@ -50,7 +35,8 @@
           size="mini"
           @click="handleAdd"
           v-hasPermi="['system:cat:add']"
-        >新增</el-button>
+        >新增
+        </el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
@@ -61,7 +47,8 @@
           :disabled="single"
           @click="handleUpdate"
           v-hasPermi="['system:cat:edit']"
-        >修改</el-button>
+        >修改
+        </el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
@@ -72,7 +59,8 @@
           :disabled="multiple"
           @click="handleDelete"
           v-hasPermi="['system:cat:remove']"
-        >删除</el-button>
+        >删除
+        </el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
@@ -80,17 +68,18 @@
           plain
           icon="el-icon-download"
           size="mini"
-		  :loading="exportLoading"
+          :loading="exportLoading"
           @click="handleExport"
           v-hasPermi="['system:cat:export']"
-        >导出</el-button>
+        >导出
+        </el-button>
       </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
     <el-table v-loading="loading" :data="catList" @selection-change="handleSelectionChange">
-      <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="主键id" align="center" prop="id" />
+      <el-table-column type="selection" width="55" align="center"/>
+      <el-table-column label="品种名称" align="center" prop="remark"/>
       <el-table-column label="出生日期" align="center" prop="birthDate" width="180">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.birthDate, '{y}-{m}-{d}') }}</span>
@@ -101,9 +90,9 @@
           <span>{{ parseTime(scope.row.haveDate, '{y}-{m}-{d}') }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="拿猫价格" align="center" prop="primeCost" />
-      <el-table-column label="状态" align="center" prop="state" />
-      <el-table-column label="备注" align="center" prop="remark" />
+      <el-table-column label="拿猫价格" align="center" prop="primeCost"/>
+      <el-table-column label="状态" align="center" prop="state"/>
+      <el-table-column label="备注" align="center" prop="remark"/>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
@@ -112,14 +101,16 @@
             icon="el-icon-edit"
             @click="handleUpdate(scope.row)"
             v-hasPermi="['system:cat:edit']"
-          >修改</el-button>
+          >修改
+          </el-button>
           <el-button
             size="mini"
             type="text"
             icon="el-icon-delete"
             @click="handleDelete(scope.row)"
             v-hasPermi="['system:cat:remove']"
-          >删除</el-button>
+          >删除
+          </el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -135,36 +126,45 @@
     <!-- 添加或修改猫咪管理对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="种类id" prop="breedId">
-          <el-input v-model="form.breedId" placeholder="请输入种类id" />
+
+        <el-form-item label="品种名称">
+          <el-select v-model="form.breedId" placeholder="请选择">
+            <el-option
+              v-for="breed in breeds"
+              :key="breed.id"
+              :label="breed.breedName"
+              :value="breed.id"
+            ></el-option>
+          </el-select>
         </el-form-item>
+
         <el-form-item label="出生日期" prop="birthDate">
           <el-date-picker clearable size="small"
-            v-model="form.birthDate"
-            type="date"
-            value-format="yyyy-MM-dd"
-            placeholder="选择出生日期">
+                          v-model="form.birthDate"
+                          type="date"
+                          value-format="yyyy-MM-dd"
+                          placeholder="选择出生日期">
           </el-date-picker>
         </el-form-item>
         <el-form-item label="拿猫日期" prop="haveDate">
           <el-date-picker clearable size="small"
-            v-model="form.haveDate"
-            type="date"
-            value-format="yyyy-MM-dd"
-            placeholder="选择拿猫日期">
+                          v-model="form.haveDate"
+                          type="date"
+                          value-format="yyyy-MM-dd"
+                          placeholder="选择拿猫日期">
           </el-date-picker>
         </el-form-item>
         <el-form-item label="拿猫价格" prop="primeCost">
-          <el-input v-model="form.primeCost" placeholder="请输入拿猫价格" />
+          <el-input v-model="form.primeCost" placeholder="请输入拿猫价格"/>
         </el-form-item>
         <el-form-item label="图片地址" prop="url">
-          <el-input v-model="form.url" placeholder="请输入图片地址" />
+          <el-input v-model="form.url" placeholder="请输入图片地址"/>
         </el-form-item>
         <el-form-item label="状态" prop="state">
-          <el-input v-model="form.state" placeholder="请输入状态" />
+          <el-input v-model="form.state" placeholder="请输入状态"/>
         </el-form-item>
         <el-form-item label="备注" prop="remark">
-          <el-input v-model="form.remark" type="textarea" placeholder="请输入内容" />
+          <el-input v-model="form.remark" type="textarea" placeholder="请输入内容"/>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -176,14 +176,15 @@
 </template>
 
 <script>
-import { listCat, getCat, delCat, addCat, updateCat, exportCat } from "@/api/pet/cat";
+import {listBreedAll, listCat, getCat, delCat, addCat, updateCat, exportCat} from "@/api/pet/cat";
 
 export default {
   name: "Cat",
-  components: {
-  },
+  components: {},
   data() {
     return {
+      //猫咪种类
+      breeds: [],
       // 遮罩层
       loading: true,
       // 导出遮罩层
@@ -216,14 +217,22 @@ export default {
       // 表单参数
       form: {},
       // 表单校验
-      rules: {
-      }
+      rules: {}
     };
   },
+  //初始话方法
   created() {
     this.getList();
+    this.getBreedList()
   },
   methods: {
+    // 获取所有的猫的种类
+    getBreedList() {
+      listBreedAll().then(Response => {
+        this.breeds = Response.data;
+      });
+    },
+
     /** 查询猫咪管理列表 */
     getList() {
       this.loading = true;
@@ -269,7 +278,7 @@ export default {
     // 多选框选中数据
     handleSelectionChange(selection) {
       this.ids = selection.map(item => item.id)
-      this.single = selection.length!==1
+      this.single = selection.length !== 1
       this.multiple = !selection.length
     },
     /** 新增按钮操作 */
@@ -312,30 +321,30 @@ export default {
     handleDelete(row) {
       const ids = row.id || this.ids;
       this.$confirm('是否确认删除猫咪管理编号为"' + ids + '"的数据项?', "警告", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
-        }).then(function() {
-          return delCat(ids);
-        }).then(() => {
-          this.getList();
-          this.msgSuccess("删除成功");
-        })
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      }).then(function () {
+        return delCat(ids);
+      }).then(() => {
+        this.getList();
+        this.msgSuccess("删除成功");
+      })
     },
     /** 导出按钮操作 */
     handleExport() {
       const queryParams = this.queryParams;
       this.$confirm('是否确认导出所有猫咪管理数据项?', "警告", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
-        }).then(() => {
-          this.exportLoading = true;
-          return exportCat(queryParams);
-        }).then(response => {
-          this.download(response.msg);
-          this.exportLoading = false;
-        })
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      }).then(() => {
+        this.exportLoading = true;
+        return exportCat(queryParams);
+      }).then(response => {
+        this.download(response.msg);
+        this.exportLoading = false;
+      })
     }
   }
 };
