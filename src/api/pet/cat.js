@@ -9,6 +9,14 @@ export function listCat(query) {
   })
 }
 
+// 查询种类列表
+export function listBreedAll() {
+  return request({
+    url: '/system/breed/list/all',
+    method: 'get'
+  })
+}
+
 // 查询猫咪管理详细
 export function getCat(id) {
   return request({
