@@ -88,10 +88,9 @@
 
     <el-table v-loading="loading" :data="goodsList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="物品id" align="center" prop="id" />
-      <el-table-column label="物品类别" align="center" prop="type" />
+      <el-table-column label="物品类别" align="center" :formatter="goodsTypeFormat" prop="type" />
       <el-table-column label="物品名称" align="center" prop="name" />
-      <el-table-column label="库存" align="center" prop=" inventory" />
+      <el-table-column label="库存" align="center" prop="inventory" />
       <el-table-column label="价格" align="center" prop="price" />
       <el-table-column label="备注" align="center" prop="remark" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
@@ -125,9 +124,15 @@
     <!-- 添加或修改物品对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="物品类别" prop="type">
-          <el-select v-model="form.type" placeholder="请选择物品类别">
-            <el-option label="请选择字典生成" value="" />
+
+        <el-form-item label="物品类别">
+          <el-select v-model="form.type" placeholder="请选择">
+            <el-option
+              v-for="dict in goodsTypeOptions"
+              :key="dict.dictValue"
+              :label="dict.dictLabel"
+              :value="dict.dictValue"
+            ></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="物品名称" prop="name">
@@ -160,6 +165,8 @@ export default {
   },
   data() {
     return {
+      //物品类别字典
+      goodsTypeOptions:[],
       // 遮罩层
       loading: true,
       // 导出遮罩层
@@ -198,6 +205,9 @@ export default {
   },
   created() {
     this.getList();
+    this.getDicts("fy_goods_type").then(response => {
+      this.goodsTypeOptions = response.data;
+    });
   },
   methods: {
     /** 查询物品列表 */
@@ -213,6 +223,10 @@ export default {
     cancel() {
       this.open = false;
       this.reset();
+    },
+    // 字典状态字典翻译
+    goodsTypeFormat(row, column) {
+      return this.selectDictLabel(this.goodsTypeOptions, row.type);
     },
     // 表单重置
     reset() {
