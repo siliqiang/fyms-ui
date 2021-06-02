@@ -89,7 +89,7 @@
     <el-table v-loading="loading" :data="clientList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center"/>
       <el-table-column label="客户姓名" align="center" prop="name"/>
-      <el-table-column label="性别" align="center" :formatter="statusFormat" prop="sex"/>
+      <el-table-column label="性别" align="center" :formatter="sexFormat" prop="sex"/>
       <el-table-column label="电话" align="center" prop="tel"/>
       <el-table-column label="成交时间" align="center" prop="fixtureDate" width="180">
         <template slot-scope="scope">
@@ -260,7 +260,7 @@ export default {
       this.resetForm('form')
     },
     // 字典状态字典翻译
-    statusFormat(row, column) {
+    sexFormat(row, column) {
       return this.selectDictLabel(this.sexOptions, row.sex);
     },
     /** 搜索按钮操作 */
