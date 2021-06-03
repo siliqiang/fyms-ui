@@ -3,31 +3,18 @@
     <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
       <el-form-item label="物品类别" prop="type">
         <el-select v-model="queryParams.type" placeholder="请选择物品类别" clearable size="small">
-          <el-option label="请选择字典生成" value="" />
+          <el-option
+            v-for="dict in goodsTypeOptions"
+            :key="dict.dictValue"
+            :label="dict.dictLabel"
+            :value="dict.dictValue"
+          ></el-option>
         </el-select>
       </el-form-item>
       <el-form-item label="物品名称" prop="name">
         <el-input
           v-model="queryParams.name"
           placeholder="请输入物品名称"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="库存" prop=" inventory">
-        <el-input
-          v-model="queryParams. inventory"
-          placeholder="请输入库存"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="价格" prop="price">
-        <el-input
-          v-model="queryParams.price"
-          placeholder="请输入价格"
           clearable
           size="small"
           @keyup.enter.native="handleQuery"

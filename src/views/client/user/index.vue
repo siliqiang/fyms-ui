@@ -91,13 +91,15 @@
       <el-table-column label="客户姓名" align="center" prop="name"/>
       <el-table-column label="性别" align="center" :formatter="sexFormat" prop="sex"/>
       <el-table-column label="电话" align="center" prop="tel"/>
-      <el-table-column label="成交时间" align="center" prop="fixtureDate" width="180">
+      <el-table-column label="进客时间" align="center" prop="fixtureDate" width="180">
         <template slot-scope="scope">
           <span>{{
               parseTime(scope.row.fixtureDate, '{y}-{m}-{d}')
             }}</span>
         </template>
       </el-table-column>
+
+      <el-table-column label="状态" align="center" :formatter="userStatusFormat" prop="status" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
@@ -120,7 +122,7 @@
             size="mini"
             type="text"
             icon="el-icon-view"
-           >查看详情
+          >查看详情
           </el-button>
         </template>
       </el-table-column>
@@ -155,17 +157,24 @@
         <el-form-item label="电话" prop="tel">
           <el-input v-model="form.tel" placeholder="请输入电话"/>
         </el-form-item>
-        <el-form-item label="成交时间" prop="fixtureDate">
+        <el-form-item label="进客时间" prop="fixtureDate">
           <el-date-picker clearable size="small"
                           v-model="form.fixtureDate"
                           type="date"
                           value-format="yyyy-MM-dd"
-                          placeholder="选择成交时间"
-          >
+                          placeholder="选择成交时间">
           </el-date-picker>
         </el-form-item>
-        <el-form-item label="删除标志" prop="delFlag">
-          <el-input v-model="form.delFlag" placeholder="请输入删除标志"/>
+
+        <el-form-item label="状态">
+          <el-select v-model="form.status" placeholder="请选择">
+            <el-option
+              v-for="dict in userStatusOptions"
+              :key="dict.dictValue"
+              :label="dict.dictLabel"
+              :value="dict.dictValue"
+            ></el-option>
+          </el-select>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -177,13 +186,15 @@
 </template>
 
 <script>
-import { listClient, getClient, delClient, addClient, updateClient, exportClient } from '@/api/system/client'
+import {listClient, getClient, delClient, addClient, updateClient, exportClient} from '@/api/system/client'
 
 export default {
   name: 'Client',
   components: {},
   data() {
     return {
+      //客户状态字典
+      userStatusOptions:[],
       // 遮罩层
       loading: true,
       // 导出遮罩层
@@ -212,7 +223,7 @@ export default {
         pageSize: 10,
         name: null,
         tel: null,
-        sex:null,
+        sex: null,
 
         fixtureDate: null
       },
@@ -224,6 +235,9 @@ export default {
   },
   created() {
     this.getList()
+    this.getDicts("fy_user_status").then(response => {
+      this.userStatusOptions = response.data;
+    });
     this.getDicts("sys_user_sex").then(response => {
       this.sexOptions = response.data;
     });
@@ -249,7 +263,7 @@ export default {
         id: null,
         name: null,
         tel: null,
-        sex:null,
+        sex: null,
         fixtureDate: null,
         delFlag: null,
         createBy: null,
@@ -262,6 +276,10 @@ export default {
     // 字典状态字典翻译
     sexFormat(row, column) {
       return this.selectDictLabel(this.sexOptions, row.sex);
+    },
+
+    userStatusFormat(row, column) {
+      return this.selectDictLabel(this.userStatusOptions, row.status);
     },
     /** 搜索按钮操作 */
     handleQuery() {
@@ -322,7 +340,7 @@ export default {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
-      }).then(function() {
+      }).then(function () {
         return delClient(ids)
       }).then(() => {
         this.getList()

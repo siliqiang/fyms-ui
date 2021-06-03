@@ -145,16 +145,21 @@
     <!-- 添加或修改订单对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
+        <el-form-item label="订单类型">
+          <el-select v-model="form.type" placeholder="请选择">
+            <el-option
+              v-for="dict in ordersTypeOptions"
+              :key="dict.dictValue"
+              :label="dict.dictLabel"
+              :value="dict.dictValue"
+            ></el-option>
+          </el-select>
+        </el-form-item>
         <el-form-item label="客户id" prop="clientId">
           <el-input v-model="form.clientId" placeholder="请输入客户id" />
         </el-form-item>
         <el-form-item label="来源id" prop="sourceId">
           <el-input v-model="form.sourceId" placeholder="请输入来源id" />
-        </el-form-item>
-        <el-form-item label="订单类型" prop="type">
-          <el-select v-model="form.type" placeholder="请选择订单类型">
-            <el-option label="请选择字典生成" value="" />
-          </el-select>
         </el-form-item>
         <el-form-item label="售价" prop="sellingPrice">
           <el-input v-model="form.sellingPrice" placeholder="请输入售价" />
@@ -186,6 +191,8 @@ export default {
   },
   data() {
     return {
+      //物品类别字典
+      ordersTypeOptions:[],
       // 遮罩层
       loading: true,
       // 导出遮罩层
@@ -226,8 +233,15 @@ export default {
   },
   created() {
     this.getList();
+    this.getDicts("fy_orders_type").then(response => {
+      this.ordersTypeOptions = response.data;
+    });
   },
   methods: {
+    // 字典状态字典翻译
+    ordersTypeFormat(row, column) {
+      return this.selectDictLabel(this.ordersTypeOptions, row.type);
+    },
     /** 查询订单列表 */
     getList() {
       this.loading = true;

@@ -135,7 +135,7 @@
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
 
         <el-form-item label="品种名称">
-          <el-select v-model="form.breedId" placeholder="请选择">
+          <el-select v-model="form.breedId" filterable placeholder="请选择">
             <el-option
               v-for="breed in breeds"
               :key="breed.id"
@@ -162,7 +162,7 @@
           </el-date-picker>
         </el-form-item>
         <el-form-item label="拿猫价格" prop="primeCost">
-          <el-input v-model="form.primeCost" placeholder="请输入拿猫价格"/>
+          <el-input type="number" v-model="form.primeCost" placeholder="请输入拿猫价格"/>
         </el-form-item>
         <el-form-item label="图片地址" prop="url">
           <el-upload
