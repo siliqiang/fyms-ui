@@ -122,14 +122,16 @@
             ></el-option>
           </el-select>
         </el-form-item>
+
+
         <el-form-item label="物品名称" prop="name">
-          <el-input v-model="form.name" placeholder="请输入物品名称" />
+          <el-input v-model="form.name" placeholder="请输入物品名称" width="50px" />
         </el-form-item>
         <el-form-item label="库存" prop=" inventory">
           <el-input v-model="form. inventory" placeholder="请输入库存" />
         </el-form-item>
         <el-form-item label="价格" prop="price">
-          <el-input v-model="form.price" placeholder="请输入价格" />
+          <el-input type="number" v-model="form.price" placeholder="请输入价格" width="50"/>
         </el-form-item>
         <el-form-item label="备注" prop="remark">
           <el-input v-model="form.remark" type="textarea" placeholder="请输入内容" />

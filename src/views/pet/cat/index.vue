@@ -81,6 +81,7 @@
       <el-table-column type="selection" width="55" align="center"/>
       <el-table-column label="类别" align="center" prop="category"/>
       <el-table-column label="品种名称" align="center" prop="breedName"/>
+      <el-table-column label="猫咪名称" align="center" prop="name"/>
       <el-table-column label="出生日期" align="center" prop="birthDate" width="180">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.birthDate, '{y}-{m}-{d}') }}</span>
@@ -131,38 +132,72 @@
     />
 
     <!-- 添加或修改猫咪管理对话框 -->
-    <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
+    <el-dialog :title="title" :visible.sync="open" width="640px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
+        <el-row>
+          <el-col :span="12">
+            <el-form-item label="品种名称">
+              <el-select v-model="form.breedId" filterable placeholder="请选择">
+                <el-option
+                  v-for="breed in breeds"
+                  :key="breed.id"
+                  :label="breed.breedName"
+                  :value="breed.id"
+                ></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="猫咪名称" prop="name">
+              <el-input  v-model="form.name" placeholder="请输入猫咪名称"/>
+            </el-form-item>
+          </el-col>
 
-        <el-form-item label="品种名称">
-          <el-select v-model="form.breedId" filterable placeholder="请选择">
-            <el-option
-              v-for="breed in breeds"
-              :key="breed.id"
-              :label="breed.breedName"
-              :value="breed.id"
-            ></el-option>
-          </el-select>
-        </el-form-item>
+        </el-row>
+        <el-row>
+          <el-col :span="12">
+            <el-form-item label="出生日期" prop="birthDate">
+              <el-date-picker clearable size="small"
+                              v-model="form.birthDate"
+                              type="date"
+                              value-format="yyyy-MM-dd"
+                              placeholder="选择出生日期">
+              </el-date-picker>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="拿猫日期" prop="haveDate">
+              <el-date-picker clearable size="small"
+                              v-model="form.haveDate"
+                              type="date"
+                              value-format="yyyy-MM-dd"
+                              placeholder="选择拿猫日期">
+              </el-date-picker>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="12">
+            <el-form-item label="状态">
+              <el-select v-model="form.state" placeholder="请选择">
+                <el-option
+                  v-for="dict in states"
+                  :key="dict.dictValue"
+                  :label="dict.dictLabel"
+                  :value="dict.dictValue"
+                ></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="拿猫价格" prop="primeCost">
+              <el-input type="number" v-model="form.primeCost" placeholder="请输入拿猫价格"/>
+            </el-form-item>
+          </el-col>
+        </el-row>
 
-        <el-form-item label="出生日期" prop="birthDate">
-          <el-date-picker clearable size="small"
-                          v-model="form.birthDate"
-                          type="date"
-                          value-format="yyyy-MM-dd"
-                          placeholder="选择出生日期">
-          </el-date-picker>
-        </el-form-item>
-        <el-form-item label="拿猫日期" prop="haveDate">
-          <el-date-picker clearable size="small"
-                          v-model="form.haveDate"
-                          type="date"
-                          value-format="yyyy-MM-dd"
-                          placeholder="选择拿猫日期">
-          </el-date-picker>
-        </el-form-item>
-        <el-form-item label="拿猫价格" prop="primeCost">
-          <el-input type="number" v-model="form.primeCost" placeholder="请输入拿猫价格"/>
+        <el-form-item label="备注" prop="remark">
+          <el-input v-model="form.remark" type="textarea" placeholder="请输入内容"/>
         </el-form-item>
         <el-form-item label="图片地址" prop="url">
           <el-upload
@@ -176,22 +211,11 @@
             :on-success="handleFileSuccess"
             :auto-upload="false">
             <el-button slot="trigger" size="small" type="primary">选取文件</el-button>
-            <el-button style="margin-left: 10px;" size="small" type="success" :loading="upload.isUploading" @click="submitUpload">上传到服务器</el-button>
+            <el-button style="margin-left: 10px;" size="small" type="success" :loading="upload.isUploading"
+                       @click="submitUpload">上传到服务器
+            </el-button>
             <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
           </el-upload>
-        </el-form-item>
-        <el-form-item label="状态">
-          <el-select v-model="form.state" placeholder="请选择">
-            <el-option
-              v-for="dict in states"
-              :key="dict.dictValue"
-              :label="dict.dictLabel"
-              :value="dict.dictValue"
-            ></el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="备注" prop="remark">
-          <el-input v-model="form.remark" type="textarea" placeholder="请输入内容"/>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -203,7 +227,7 @@
 </template>
 
 <script>
-import { getToken} from "@/utils/auth"
+import {getToken} from "@/utils/auth"
 import {listBreedAll, listCat, getCat, delCat, addCat, updateCat, exportCat} from "@/api/pet/cat";
 
 
@@ -218,16 +242,14 @@ export default {
         // 是否禁用上传
         isUploading: false,
         // 设置上传的请求头部
-        headers: { Authorization: "Bearer " + getToken() },
+        headers: {Authorization: "Bearer " + getToken()},
         // 上传的地址
         url: process.env.VUE_APP_BASE_API + "/common/upload",
         // 上传的文件列表
-        fileList: [
-
-        ]
+        fileList: []
       },
       //状态字典
-      states:[],
+      states: [],
       //猫咪种类
       breeds: [],
       // 遮罩层
@@ -276,16 +298,15 @@ export default {
   methods: {
 
 
-
     // 文件提交处理
     submitUpload() {
       this.$refs.upload.submit();
     },
-   // 文件上传中处理
+    // 文件上传中处理
     handleFileUploadProgress(event, file, fileList) {
       this.upload.isUploading = true;
     },
-   // 文件上传成功处理
+    // 文件上传成功处理
     handleFileSuccess(response, file, fileList) {
       this.upload.isUploading = false;
       this.form.url = response.url;
@@ -300,6 +321,7 @@ export default {
     getBreedList() {
       listBreedAll().then(Response => {
         this.breeds = Response.data;
+        console.log(this.breeds);
       });
     },
 
@@ -321,8 +343,9 @@ export default {
     reset() {
       this.form = {
         id: null,
-        category:null,
+        category: null,
         breedName: null,
+        name: null,
         birthDate: null,
         haveDate: null,
         primeCost: null,
@@ -362,8 +385,8 @@ export default {
     /** 修改按钮操作 */
     handleUpdate(row) {
       debugger
-      this.upload.fileList = [{ name: this.form.fileName, url: this.form.url }];
-      console.log(this.form.url+"url");
+      this.upload.fileList = [{name: this.form.fileName, url: this.form.url}];
+      console.log(this.form.url + "url");
       this.reset();
       const id = row.id || this.ids
       getCat(id).then(response => {

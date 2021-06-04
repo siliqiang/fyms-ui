@@ -106,13 +106,13 @@
 
     <el-table v-loading="loading" :data="ordersList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="订单id" align="center" prop="id" />
-      <el-table-column label="客户id" align="center" prop="clientId" />
-      <el-table-column label="来源id" align="center" prop="sourceId" />
+      <el-table-column label="客户姓名" align="center" prop="clientId" />
+      <el-table-column label="来源" align="center" prop="sourceId" />
       <el-table-column label="订单类型" align="center" prop="type" />
       <el-table-column label="售价" align="center" prop="sellingPrice" />
       <el-table-column label="数量" align="center" prop="quantity" />
       <el-table-column label="价格" align="center" prop="price" />
+      <el-table-column label="利润" align="center" prop="price" />
       <el-table-column label="备注" align="center" prop="remark" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
@@ -155,8 +155,15 @@
             ></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="客户id" prop="clientId">
-          <el-input v-model="form.clientId" placeholder="请输入客户id" />
+        <el-form-item label="客户姓名" prop="clientId">
+          <el-select v-model="form.clientId" filterable placeholder="请选择">
+            <el-option
+              v-for="user in listUserSelect"
+              :key="user.id"
+              :label="user.name"
+              :value="user.id"
+            ></el-option>
+          </el-select>
         </el-form-item>
         <el-form-item label="来源id" prop="sourceId">
           <el-input v-model="form.sourceId" placeholder="请输入来源id" />
@@ -183,7 +190,7 @@
 </template>
 
 <script>
-import { listOrders, getOrders, delOrders, addOrders, updateOrders, exportOrders } from "@/api/orders/orders";
+import {listUserSelect, listOrders, getOrders, delOrders, addOrders, updateOrders, exportOrders } from "@/api/orders/orders";
 
 export default {
   name: "Orders",
@@ -191,6 +198,7 @@ export default {
   },
   data() {
     return {
+      listUserSelect:[],
       //物品类别字典
       ordersTypeOptions:[],
       // 遮罩层
@@ -233,11 +241,18 @@ export default {
   },
   created() {
     this.getList();
+    this.getUserList()
     this.getDicts("fy_orders_type").then(response => {
       this.ordersTypeOptions = response.data;
     });
   },
   methods: {
+    // 获取所有用户
+    getUserList() {
+      listUserSelect().then(Response => {
+        this.listUserSelect = Response.data;
+      });
+    },
     // 字典状态字典翻译
     ordersTypeFormat(row, column) {
       return this.selectDictLabel(this.ordersTypeOptions, row.type);

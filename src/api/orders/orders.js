@@ -8,6 +8,13 @@ export function listOrders(query) {
     params: query
   })
 }
+// 查询用户列表
+export function listUserSelect() {
+  return request({
+    url: '/system/client/list/select',
+    method: 'get',
+  })
+}
 
 // 查询订单详细
 export function getOrders(id) {
