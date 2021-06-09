@@ -142,7 +142,7 @@
           </el-col>
           <el-col :span="12">
             <el-form-item label="品种名称">
-              <el-select v-model="form.breedId" filterable placeholder="请选择">
+               <el-select v-model="form.breedId" filterable placeholder="请选择">
                 <el-option
                   v-for="breed in breeds"
                   :key="breed.id"
