@@ -15,6 +15,23 @@ export function listUserSelect() {
     method: 'get',
   })
 }
+// 查询物品列表
+export function listGoods(query) {
+  return request({
+    url: '/system/goods/list/select',
+    method: 'get',
+    params: query
+  })
+}
+// 查询猫咪管理列表
+export function listCat(query) {
+  return request({
+    url: '/system/cat/list/select',
+    method: 'get',
+    params: query
+  })
+}
+
 
 // 查询订单详细
 export function getOrders(id) {

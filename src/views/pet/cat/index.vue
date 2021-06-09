@@ -81,7 +81,7 @@
       <el-table-column type="selection" width="55" align="center"/>
       <el-table-column label="类别" align="center" prop="category"/>
       <el-table-column label="品种名称" align="center" prop="breedName"/>
-      <el-table-column label="猫咪名称" align="center" prop="name"/>
+      <el-table-column label="猫咪编号" align="center" prop="num"/>
       <el-table-column label="出生日期" align="center" prop="birthDate" width="180">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.birthDate, '{y}-{m}-{d}') }}</span>
@@ -136,6 +136,11 @@
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
         <el-row>
           <el-col :span="12">
+            <el-form-item label="猫咪编号" prop="num">
+              <el-input v-model="form.num" :disabled="true" placeholder="系统自动生成编号M********"/>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
             <el-form-item label="品种名称">
               <el-select v-model="form.breedId" filterable placeholder="请选择">
                 <el-option
@@ -147,12 +152,6 @@
               </el-select>
             </el-form-item>
           </el-col>
-          <el-col :span="12">
-            <el-form-item label="猫咪名称" prop="name">
-              <el-input  v-model="form.name" placeholder="请输入猫咪名称"/>
-            </el-form-item>
-          </el-col>
-
         </el-row>
         <el-row>
           <el-col :span="12">
