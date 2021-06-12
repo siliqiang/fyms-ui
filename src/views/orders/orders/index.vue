@@ -1,48 +1,49 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="客户id" prop="clientId">
-        <el-input
+      <el-form-item label="客户名称" prop="clientId">
+        <el-select
+          filterable
           v-model="queryParams.clientId"
-          placeholder="请输入客户名称"
+          placeholder="客户名称"
           clearable
           size="small"
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="来源id" prop="sourceId">
-        <el-input
-          v-model="queryParams.sourceId"
-          placeholder="请输入来源id"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="订单类型" prop="type">
-        <el-select v-model="queryParams.type" placeholder="请选择订单类型" clearable size="small">
-          <el-option label="请选择字典生成" value=""/>
+          style="width: 240px">
+          <el-option
+            v-for="(user,index) in listUserSelect"
+            :key="user.id"
+            :label="user.name"
+            :value="user.id"
+          />
         </el-select>
       </el-form-item>
-      <el-form-item label="售价" prop="sellingPrice">
-        <el-input
-          v-model="queryParams.sellingPrice"
-          placeholder="请输入售价"
+
+      <el-form-item label="猫咪编号" prop="sourceId">
+        <el-select
+          filterable
+          v-model="queryParams.sourceId"
+          placeholder="猫咪编号"
           clearable
           size="small"
-          @keyup.enter.native="handleQuery"
-        />
+          style="width: 240px">
+          <el-option
+            v-for="cat in catList"
+            :key="cat.id"
+            :label="cat.num"
+            :value="cat.id"
+          />
+        </el-select>
       </el-form-item>
 
-      <el-form-item label="价格" prop="price">
-        <el-input
-          v-model="queryParams.price"
-          placeholder="请输入价格"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
+      <el-form-item label="订单类型" prop="type">
+        <el-select v-model="queryParams.type" placeholder="请选择订单类型" clearable size="small">
+          <el-option v-for="dict in ordersTypeOptions"
+                     :key="dict.dictValue"
+                     :label="dict.dictLabel"
+                     :value="dict.dictValue"/>
+        </el-select>
       </el-form-item>
+
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
         <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
@@ -102,13 +103,13 @@
 
     <el-table v-loading="loading" :data="ordersList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center"/>
-      <el-table-column label="客户姓名" align="center" prop="clientId"/>
-      <el-table-column label="来源" align="center" prop="sourceId"/>
-      <el-table-column label="订单类型" align="center" prop="type"/>
-      <el-table-column label="售价" align="center" prop="sellingPrice"/>
+      <el-table-column label="客户姓名" align="center" prop="userName"/>
+      <el-table-column label="猫咪编号/物品名称" align="center" prop="sourceName"/>
+      <el-table-column label="订单类型" align="center" :formatter="typeFormat" prop="type"/>
+      <el-table-column label="售价（单位：元）" align="center" prop="sellingPrice"/>
       <el-table-column label="数量" align="center" prop="quantity"/>
-      <el-table-column label="价格" align="center" prop="price"/>
-      <el-table-column label="利润" align="center" prop="price"/>
+      <el-table-column label="进价（单位：元）" align="center" prop="price"/>
+      <el-table-column label="利润（单位：元）" align="center" prop="price"/>
       <el-table-column label="备注" align="center" prop="remark"/>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
@@ -163,17 +164,17 @@
             ></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item v-if="ordersTypeOptionsKey=='猫咪'" label="猫咪名称" prop="sourceId">
+        <el-form-item v-show="ordersTypeOptionsKey=='猫咪'" label="猫咪名称" prop="sourceId">
           <el-select v-model="form.sourceId" filterable placeholder="请选择">
             <el-option
               v-for="cat in catList"
               :key="cat.id"
-              :label="cat.name"
+              :label="cat.num"
               :value="cat.id"
             ></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item v-if="ordersTypeOptionsKey!='猫咪' " label="药/物名称" prop="sourceId">
+        <el-form-item v-show="ordersTypeOptionsKey!='猫咪' " label="药/物名称" prop="sourceId">
           <el-select v-model="form.sourceId" filterable placeholder="请选择">
             <el-option
               v-for="orderType in goodsList"
@@ -283,6 +284,11 @@ export default {
     });
   },
   methods: {
+
+    // 字典状态字典翻译
+    typeFormat(row, column) {
+      return this.selectDictLabel(this.ordersTypeOptions, row.type);
+    },
     /** 查询订单列表 */
     getGoodsList() {
       listGoods(this.goods).then(response => {
@@ -339,6 +345,8 @@ export default {
     // 表单重置
     reset() {
       this.form = {
+        userName:null,
+        sourceName:null,
         id: null,
         clientId: null,
         sourceId: null,
@@ -354,6 +362,7 @@ export default {
       };
       this.resetForm("form");
     },
+
     /** 搜索按钮操作 */
     handleQuery() {
       this.queryParams.pageNum = 1;
