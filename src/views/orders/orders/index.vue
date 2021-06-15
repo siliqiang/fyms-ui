@@ -142,60 +142,86 @@
     />
 
     <!-- 添加或修改订单对话框 -->
-    <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
+    <el-dialog :title="title" :visible.sync="open" width="640px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="订单类型">
-          <el-select v-model="form.type" placeholder="请选择" @change="typeChange(form.type)">
-            <el-option
-              v-for="dict in ordersTypeOptions"
-              :key="dict.dictValue"
-              :label="dict.dictLabel"
-              :value="dict.dictValue"
-            ></el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="客户姓名" prop="clientId">
-          <el-select v-model="form.clientId" filterable placeholder="请选择">
-            <el-option
-              v-for="(user,index) in listUserSelect"
-              :key="user.id"
-              :label="user.name"
-              :value="user.id"
-            ></el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item v-show="ordersTypeOptionsKey=='猫咪'" label="猫咪名称" prop="sourceId">
-          <el-select v-model="form.sourceId" filterable placeholder="请选择">
-            <el-option
-              v-for="cat in catList"
-              :key="cat.id"
-              :label="cat.num"
-              :value="cat.id"
-            ></el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item v-show="ordersTypeOptionsKey!='猫咪' " label="药/物名称" prop="sourceId">
-          <el-select v-model="form.sourceId" filterable placeholder="请选择">
-            <el-option
-              v-for="orderType in goodsList"
-              :key="orderType.id"
-              :label="orderType.name"
-              :value="orderType.id"
-            ></el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="售价" prop="sellingPrice">
-          <el-input v-model="form.sellingPrice" placeholder="请输入售价"/>
-        </el-form-item>
-        <el-form-item label="数量" prop="quantity">
-          <el-input v-model="form.quantity" placeholder="请输入数量"/>
-        </el-form-item>
-        <el-form-item label="价格" prop="price">
-          <el-input v-model="form.price" placeholder="请输入价格"/>
-        </el-form-item>
-        <el-form-item label="备注" prop="remark">
-          <el-input v-model="form.remark" type="textarea" placeholder="请输入内容"/>
-        </el-form-item>
+        <el-row>
+          <el-col :span="12">
+            <el-form-item label="客户姓名" prop="clientId">
+              <el-select v-model="form.clientId" filterable placeholder="请选择">
+                <el-option
+                  v-for="(user,index) in listUserSelect"
+                  :key="user.id"
+                  :label="user.name"
+                  :value="user.id"
+                ></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+
+          <el-col :span="12">
+            <el-form-item label="订单类型">
+              <el-select v-model="form.type" placeholder="请选择" @change="typeChange(form.type)">
+                <el-option
+                  v-for="dict in ordersTypeOptions"
+                  :key="dict.dictValue"
+                  :label="dict.dictLabel"
+                  :value="dict.dictValue"
+                ></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+        </el-row>
+
+        <el-row>
+          <el-col :span="12">
+            <el-form-item v-show="ordersTypeOptionsKey=='猫咪'" label="猫咪名称" prop="sourceId">
+              <el-select v-model="form.sourceId" filterable placeholder="请选择" @change="numChange(form.sourceId)">
+                <el-option
+                  v-for="cat in catList"
+                  :key="cat.id"
+                  :label="cat.num"
+                  :value="cat.id"
+                ></el-option>
+              </el-select>
+            </el-form-item>
+            <el-form-item v-show="ordersTypeOptionsKey!='猫咪' " label="药/物名称" prop="sourceId">
+              <el-select v-model="form.sourceId" filterable placeholder="请选择" @change="numChange(form.sourceId)" >
+                <el-option
+                  v-for="orderType in goodsList"
+                  :key="orderType.id"
+                  :label="orderType.name"
+                  :value="orderType.id"
+                ></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+
+          <el-col :span="12">
+            <el-form-item label="零售价" prop="sellingPrice">
+              <el-input v-model="form.sellingPrice" placeholder="请输入售价" :controls="false" :precision="2"/>
+            </el-form-item>
+          </el-col>
+        </el-row>
+
+        <el-row>
+          <el-col :span="12">
+            <el-form-item label="数量" prop="quantity">
+              <el-input type="number" v-model="form.quantity" placeholder="请输入数量"/>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="拿货价" prop="price">
+              <el-input v-model="form.price" placeholder="请输入价格"/>
+            </el-form-item>
+          </el-col>
+        </el-row>
+
+        <el-row>
+          <el-form-item label="备注" prop="remark">
+            <el-input v-model="form.remark" type="textarea" placeholder="请输入内容"/>
+          </el-form-item>
+        </el-row>
+
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button type="primary" @click="submitForm">确 定</el-button>
@@ -219,18 +245,23 @@ import {
 } from "@/api/orders/orders";
 
 export default {
+  filters: {
+    rounding (value) {
+      return value.toFixed(2)
+    }
+  },
   name: "Orders",
   components: {},
   data() {
     return {
       //猫咪列表
-      catList:[],
+      catList: [],
       //猫咪列表查询条件
-      catParams:{state:0},
+      catParams: {state: 0, id: null},
       //获取选中物品的类型
-      goods: {type: null},
+      goods: {type: null, id: null},
       //物品的列表
-      goodsList:[],
+      goodsList: [],
       //客户的集合下拉
       listUserSelect: [],
       //类型的值判断下面的是否需要显示
@@ -301,7 +332,25 @@ export default {
         this.catList = response.data;
       });
     },
-     /** 获取所有用户*/
+    /** 根据猫咪或者物品的改变自动拿到进货的价格 */
+    numChange(val) {
+      this.catParams.id = val
+      this.goods.id = val
+      listGoods(this.goods).then(response => {
+        if (response.data[0].price != null) {
+          this.form.price = response.data[0].price;
+        }
+
+        this.goodsList = response.data;
+      });
+      listCat(this.catParams).then(response => {
+        if (response.data[0].primeCost != null) {
+          this.form.price = response.data[0].primeCost;
+        }
+
+      });
+    },
+    /** 获取所有用户*/
     getUserList() {
       listUserSelect().then(Response => {
         this.listUserSelect = Response.data;
@@ -310,14 +359,15 @@ export default {
 
     /**获取类型下拉的参数信息*/
     typeChange(val) {
-      this.form.sourceId=null;
+      this.form.sourceId = null;
+      this.form.price = null;
       this.ordersTypeOptions.forEach(a => {
         if (a.dictValue === val) {
           this.ordersTypeOptionsKey = a.dictLabel
-          this.goods.type=a.dictValue
+          this.goods.type = a.dictValue
         }
       })
-      if(this.ordersTypeOptionsKey!='猫咪'){
+      if (this.ordersTypeOptionsKey != '猫咪') {
         this.getGoodsList();
       }
 
@@ -345,8 +395,8 @@ export default {
     // 表单重置
     reset() {
       this.form = {
-        userName:null,
-        sourceName:null,
+        userName: null,
+        sourceName: null,
         id: null,
         clientId: null,
         sourceId: null,
