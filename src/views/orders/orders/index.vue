@@ -109,7 +109,7 @@
       <el-table-column label="售价（单位：元）" align="center" prop="sellingPrice"/>
       <el-table-column label="数量" align="center" prop="quantity"/>
       <el-table-column label="进价（单位：元）" align="center" prop="price"/>
-      <el-table-column label="利润（单位：元）" align="center" prop="price"/>
+      <el-table-column label="利润（单位：元）" align="center" prop="profit"/>
       <el-table-column label="备注" align="center" prop="remark"/>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
@@ -211,7 +211,7 @@
           </el-col>
           <el-col :span="12">
             <el-form-item label="拿货价" prop="price">
-              <el-input v-model="form.price" placeholder="请输入价格"/>
+              <el-input v-model="form.price" placeholder="请输入价格" :disabled="true"/>
             </el-form-item>
           </el-col>
         </el-row>
@@ -303,7 +303,34 @@ export default {
       form: {},
       // 表单校验
       rules: {},
-      ProductActive: "1"
+      ProductActive: "1",
+
+      // 表单校验
+      rules: {
+        clientId: [
+          { required: true, message: "客户姓名不能为空", trigger: "blur" }
+        ],
+        // nickName: [
+        //   { required: true, message: "用户昵称不能为空", trigger: "blur" }
+        // ],
+        // password: [
+        //   { required: true, message: "用户密码不能为空", trigger: "blur" }
+        // ],
+        // email: [
+        //   {
+        //     type: "email",
+        //     message: "'请输入正确的邮箱地址",
+        //     trigger: ["blur", "change"]
+        //   }
+        // ],
+        // phonenumber: [
+        //   {
+        //     pattern: /^1[3|4|5|6|7|8|9][0-9]\d{8}$/,
+        //     message: "请输入正确的手机号码",
+        //     trigger: "blur"
+        //   }
+        // ]
+      }
     };
   },
   created() {
@@ -395,6 +422,7 @@ export default {
     // 表单重置
     reset() {
       this.form = {
+        profit:null,
         userName: null,
         sourceName: null,
         id: null,
